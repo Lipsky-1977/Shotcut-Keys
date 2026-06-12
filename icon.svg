@@ -31,4 +31,8 @@
   <rect x="15" y="19.5" width="2.5" height="2" rx="0.4" fill="#7B2FF7" opacity="0.6"/>
   <rect x="18" y="19.5" width="2.5" height="2" rx="0.4" fill="#7B2FF7" opacity="0.6"/>
   <rect x="21" y="19.5" width="2.5" height="2" rx="0.4" fill="#7B2FF7" opacity="0.6"/>
+<<<<<<< HEAD
 </svg>
+=======
+</svg>
+>>>>>>> 9efb8fa (添加键盘主题 SVG favicon/app-icon)

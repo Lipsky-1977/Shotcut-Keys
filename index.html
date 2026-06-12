@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon.svg">
-<meta name="theme-color" content="#7B2FF7">
+<meta name="theme-color" id="themeColor" content="#7B2FF7">
 <title>图形软件快捷键 · 总览</title>
 <style>
 :root{
@@ -16,8 +16,11 @@
   --c1:#FF6A00;--c2:#00C853;--c3:#0066FF;--c4:#E63946;--c5:#7B2FF7;
   --c6:#2B7DE9;--c7:#00B8D4;--c8:#7B1FA2;--c9:#EA7600;--c10:#636366;
 }
+[data-theme=dark]{
+  --bg:#1c1c1e;--card:#2c2c2e;--border:rgba(255,255,255,.06);--text:#f5f5f7;--text2:#98989d;--shadow:0 2px 12px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.2)
+}
 @media(prefers-color-scheme:dark){
-  :root{--bg:#1c1c1e;--card:#2c2c2e;--border:rgba(255,255,255,.06);--text:#f5f5f7;--text2:#98989d;--shadow:0 2px 12px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.2)}
+  :root:not([data-theme=light]){--bg:#1c1c1e;--card:#2c2c2e;--border:rgba(255,255,255,.06);--text:#f5f5f7;--text2:#98989d;--shadow:0 2px 12px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.2)}
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
@@ -49,6 +52,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 .card .meta .dot{width:5px;height:5px;border-radius:50%;display:inline-block}
 .card .meta .cnt{font-weight:600}
 .card .arrow{position:absolute;top:10px;right:10px;width:16px;height:16px;color:var(--text2);opacity:.25}
+.theme-btn{position:fixed;bottom:16px;right:16px;z-index:300;display:flex;align-items:center;gap:8px;
+  padding:12px 20px;border:none;border-radius:30px;background:var(--accent,#7B2FF7);color:#fff;
+  font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;
+  box-shadow:0 4px 16px rgba(123,47,247,.35);transition:all .2s;backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12)}
+.theme-btn:active{transform:scale(.94)}
+.theme-btn .sun-moon{width:20px;height:20px;flex-shrink:0;transition:transform .4s ease}
+[data-theme=dark] .theme-btn .sun-moon{transform:rotate(180deg)}
+.theme-btn .sun-core,.theme-btn .sun-rays{transition:opacity .3s ease}
+[data-theme=dark] .theme-btn .sun-core,[data-theme=dark] .theme-btn .sun-rays{opacity:0}
+.theme-btn .moon{opacity:0;transition:opacity .3s ease}
+[data-theme=dark] .theme-btn .moon{opacity:1}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]) .theme-btn{background:var(--accent,#7B2FF7)}
+}
 @media(max-width:440px){
   .header{padding:28px 14px 10px}
   .header h1{font-size:21px}
@@ -67,6 +85,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
   <div class="sub">9 款软件 · 1292 条快捷键 · 手机 / PC</div>
   <div class="bar"></div>
 </div>
+<button class="theme-btn" id="themeBtn" aria-label="切换深色/浅色模式">
+  <svg class="sun-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle class="sun-core" cx="12" cy="12" r="5"/>
+    <g class="sun-rays">
+      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </g>
+    <path class="moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+  <span id="themeLabel">深色模式</span>
+</button>
 <div class="main">
   <div class="grid" id="grid"></div>
 </div>
@@ -93,7 +124,28 @@ function render(){
   ).join("");
 }
 render();
+
+// ── 主题切换 ──
+(function(){
+  const html=document.documentElement,btn=document.getElementById("themeBtn"),lbl=document.getElementById("themeLabel");
+  const saved=localStorage.getItem("theme");
+  if(saved)html.setAttribute("data-theme",saved);
+  function update(){
+    const d=html.getAttribute("data-theme");
+    const isDark=d==="dark"||(!d&&window.matchMedia("(prefers-color-scheme:dark)").matches);
+    html.setAttribute("data-theme",isDark?"light":"dark");
+    document.getElementById("themeColor").content=isDark?"#1c1c1e":"#7B2FF7";
+    localStorage.setItem("theme",html.getAttribute("data-theme"));
+    lbl.textContent=isDark?"浅色模式":"深色模式";
+  }
+  btn.addEventListener("click",update);
+  update();
+})();
+
 </script>
 </body>
 </html>
+
+
+
 

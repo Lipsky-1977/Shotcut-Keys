@@ -82,7 +82,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 <body>
 <div class="header">
   <h1>⌨ 图形软件快捷键</h1>
-  <div class="sub">9 款软件 · 1292 条快捷键 · 手机 / PC</div>
+  <div class="sub">9 款软件 · 1262 条快捷键 · 手机 / PC</div>
   <div class="bar"></div>
 </div>
 <button class="theme-btn" id="themeBtn" aria-label="切换深色/浅色模式">
@@ -130,16 +130,25 @@ render();
   const html=document.documentElement,btn=document.getElementById("themeBtn"),lbl=document.getElementById("themeLabel");
   const saved=localStorage.getItem("theme");
   if(saved)html.setAttribute("data-theme",saved);
-  function update(){
-    const d=html.getAttribute("data-theme");
-    const isDark=d==="dark"||(!d&&window.matchMedia("(prefers-color-scheme:dark)").matches);
-    html.setAttribute("data-theme",isDark?"light":"dark");
+  // Init: apply saved theme or system preference (no toggle)
+  if(saved){
+    html.setAttribute("data-theme",saved);
+  } else if(window.matchMedia("(prefers-color-scheme:dark)").matches){
+    html.setAttribute("data-theme","dark");
+  }
+  function syncUI(){
+    const isDark=html.getAttribute("data-theme")==="dark";
     document.getElementById("themeColor").content=isDark?"#1c1c1e":"#7B2FF7";
-    localStorage.setItem("theme",html.getAttribute("data-theme"));
     lbl.textContent=isDark?"浅色模式":"深色模式";
   }
-  btn.addEventListener("click",update);
-  update();
+  function toggle(){
+    const isDark=html.getAttribute("data-theme")==="dark";
+    html.setAttribute("data-theme",isDark?"light":"dark");
+    localStorage.setItem("theme",isDark?"light":"dark");
+    syncUI();
+  }
+  btn.addEventListener("click",toggle);
+  syncUI();
 })();
 
 </script>
